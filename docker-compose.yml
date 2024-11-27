@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: hospital-app
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGODB_URI=mongodb://admin:password123@mongo:27017/hospital?authSource=admin
+      - JWT_SECRET_KEY=121e16fd36f0f94324417dc103031bbc8aa160defcd7f79a25540e9a91b5da2aafd9e31fddbff320c87967d26c6b3705c5053220e383e42247da13c0143251c61a9cc8123d5ffa5ad04d6ffd41d0a7f1ed592c2c5ab29d6ef65fccf60a84dcacda35e5522464987cd90826fb9f4712574c1ed53168a0f1f9d122fac1286dfa391c606f72b1ff5aae8a09e4e51db97786f33d2c454f1510bdc8a1f53b3f8a43f99baf47e76667ed6110526a92c2cd4aa2ae002929ac8f8a29ae9724a6a0ca074783b4fc00816a5b63d31d998b3b909eca657961abed759cc29567ac0764254f02f8646ef784fb37d68d41f1e5c7f4d23a948d231c548ef950006082d5a0516f98
+      - PORT=8080
+    depends_on:
+      - mongo
+    volumes:
+      - ./backend:/app
+    networks:
+      - hospital-network
+
+  mongo:
+    image: mongo:latest
+    container_name: hospital-mongo
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password123
+    volumes:
+      - mongodb_data:/data/db
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - hospital-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  hospital-network:
